@@ -47,7 +47,7 @@ export const useUsers = (): UseUsers => {
         }
         const jsonToken = JSON.parse(atob(token.split('.')[1]))      
         const client = await service.getUserById(jsonToken.id);
-        if (client.data) {
+        if (client.data) {          
           client.data.token = token;
           dispatch(setClientData(client.data));
         } else {

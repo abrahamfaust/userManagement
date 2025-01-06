@@ -65,7 +65,7 @@ export const Dashboard = () => {
           <Toolbar>
             <Avatar sx={{ mr: 1 }}>
               {username
-                ? `${username.split("")[0]}${username.split("")[1]}`
+                ? username.split("")[0].toUpperCase()
                 : "$"}
             </Avatar>
 
@@ -75,7 +75,7 @@ export const Dashboard = () => {
               color="info"
               sx={{ flexGrow: 1 }}
             >
-              {users[0]?.username}
+              {username}
             </Typography>
             {inProgress && <CircularProgress size={24} color="inherit" />}
 

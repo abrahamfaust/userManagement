@@ -25,7 +25,7 @@ export const baseService = async (
     };
   } catch (err: any) {
 
-    if (err.response?.status === 401 || err.response?.status === 403) {
+    if (token && (err.response?.status === 401 || err.response?.status === 403)) {
         const userConfirmed = window.confirm("You are not authorized. Do you want to go to the login page?");
         
         if (userConfirmed) {

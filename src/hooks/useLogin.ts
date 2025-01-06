@@ -13,7 +13,8 @@ export const useLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
     if (!username || !password) {
       setError("Please enter both username and password.");
     } else {

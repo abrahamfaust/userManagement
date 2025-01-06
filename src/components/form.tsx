@@ -43,7 +43,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     }
   }, [userToEdit]);
 
-  const handleSave = async () => {
+  const handleSave = async (e: any) => {
+    e.preventDefault();
     if (!username || !email || !fullName || (!userToEdit && !password)) {
       setError("All fields are required");
       return;
@@ -60,7 +61,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} component={"form"} onSubmit={handleSave}>
       <DialogTitle>{userToEdit ? "Edit User" : "Add User"}</DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, width: 400 }}
@@ -99,7 +100,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
         <Button onClick={onClose} sx={{}}>
           Cancel
         </Button>
-        <Button onClick={handleSave} variant="contained">
+        <Button type="submit" variant="contained">
           Save
         </Button>
       </DialogActions>

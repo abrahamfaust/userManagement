@@ -6,7 +6,6 @@ import {
   DialogActions,
   TextField,
   Button,
-  Typography,
   Alert,
 } from "@mui/material";
 import { IUser } from "../store/usersSlice";

@@ -1,10 +1,4 @@
 import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useUsers } from "../hooks/useUsers";
@@ -18,19 +12,10 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+
 import { UserFormDialog } from "./form";
-
-interface Column {
-  id: "username" | "fullName" | "email" | "actions";
-  label: string;
-}
-
-const columns: readonly Column[] = [
-  { id: "username", label: "User Name" },
-  { id: "fullName", label: "Full Name" },
-  { id: "email", label: "Email" },
-  { id: "actions", label: "Actions" },
-];
+import { IUser } from "../store/usersSlice";
 
 export const Dashboard = () => {
   const {
@@ -47,13 +32,78 @@ export const Dashboard = () => {
     inProgress,
   } = useUsers();
 
+  const columns: GridColDef<(typeof rows)[number]>[] = [
+    {
+      field: "id",
+      headerName: "No.",
+      flex: 0.1,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+    },
+    {
+      field: "username",
+      headerName: "User Name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "fullName",
+      headerName: "Full name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1.5,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <>
+          <IconButton
+            onClick={() => {
+              setUserToEdit(params.row);
+              setPopup(true);
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton color="error" onClick={() => deleteUser(params.row._id!)}>
+            <DeleteIcon />
+          </IconButton>
+        </>
+      ),
+    },
+  ];
+
+  const rows = users.map((user: IUser, i: number) => ({
+    id: i + 1,
+    _id: user._id,
+    username: user.username,
+    fullName: user.fullName,
+    email: user.email,
+    password: user.password,
+  }));
+
   return (
     <>
       {popup && (
         <UserFormDialog
           onClose={() => {
-            setPopup(false)
-            setUserToEdit(null)
+            setPopup(false);
+            setUserToEdit(null);
           }}
           onSave={userToEdit ? editUser : addUser}
           open={popup}
@@ -64,9 +114,7 @@ export const Dashboard = () => {
         <AppBar position="static" sx={{ background: "lightgray" }}>
           <Toolbar>
             <Avatar sx={{ mr: 1 }}>
-              {username
-                ? username.split("")[0].toUpperCase()
-                : "$"}
+              {username ? username.split("")[0].toUpperCase() : "$"}
             </Avatar>
 
             <Typography
@@ -109,60 +157,45 @@ export const Dashboard = () => {
           mt: 1,
         }}
       >
-        <TableContainer sx={{ maxHeight: "70vh" }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    sx={{ background: "lightgray", textAlign: "center" }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users &&
-                users.map((user, i) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                      {columns.map((column) => {
-                        return (
-                          <TableCell
-                            key={column.id}
-                            sx={{ textAlign: "center" }}
-                          >
-                            {column.id === "actions" ? (
-                              <>
-                                <IconButton
-                                  onClick={() => {
-                                    setUserToEdit(user);
-                                    setPopup(true);
-                                  }}
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  color="error"
-                                  onClick={() => deleteUser(user._id!)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </>
-                            ) : (
-                              user[column.id]
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <DataGrid
+          sx={{
+            "& .MuiDataGrid-columnHeader": {
+              bgcolor: "primary.main",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              color: "white",
+            },
+            "& .MuiDataGrid-sortIcon": {
+              color: "white", 
+            },
+
+            '& .MuiDataGrid-cell:focus': {
+              outline: 'none',
+            },
+          }}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            }, 
+          }}
+          pageSizeOptions={[5, 10, 15, 20]}
+          disableRowSelectionOnClick
+          disableColumnMenu = {true}
+          localeText={{
+            toolbarDensity: 'Size',
+            toolbarDensityLabel: 'Size',
+            toolbarDensityCompact: 'Small',
+            toolbarDensityStandard: 'Medium',
+            toolbarDensityComfortable: 'Large',
+          }}
+          slots={{
+            toolbar: GridToolbar,
+          }}
+        />
       </Paper>
     </>
   );
